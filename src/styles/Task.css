@@ -1,0 +1,571 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #a393eb 0%, #e98b8b 100%);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container styles */
+.task-container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(to right, #738fbd, #dbd4df, #db88a4);
+    overflow-y: auto;
+    /* This fixes the gradient background */
+}
+
+/* Fixed sidebar */
+.sidebar {
+    width: 60px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+    gap: 30px;
+    transition: width 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.sidebar.expanded {
+    width: 200px;
+}
+
+/* Main content scrollable */
+.main-content {
+    flex: 1;
+    margin-left: 60px;
+    padding: 20px;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar.expanded+.main-content {
+    margin-left: 200px;
+}
+
+/* Header styles */
+.header {
+    background: white;
+    border-radius: 15px;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    min-height: 80px;
+}
+
+.header h1 {
+    background: linear-gradient(to right, #738fbd, #db88a4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* Search and Add Task styles */
+.search-add {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box input {
+    width: 300px;
+    padding: 10px 15px 10px 40px;
+    border-radius: 25px;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+    color: #666;
+}
+
+.search-box svg {
+    position: absolute;
+    left: 15px;
+    color: #666;
+    font-size: 14px;
+}
+
+.add-btn {
+    background: linear-gradient(to right, #738fbd, #db88a4);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.add-btn:hover {
+    opacity: 0.9;
+}
+
+/* Welcome section */
+.motivational {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 80px;
+}
+
+.bee-img {
+    width: 50px;
+    height: 50px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.motivational p {
+    color: #666;
+    line-height: 1.5;
+}
+
+.motivational p span {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Filters */
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.filter-btn.active {
+    background: white;
+    color: #6c5ce7;
+}
+
+select.filter-btn {
+    appearance: none;
+    padding-right: 35px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+}
+
+/* Tasks sections */
+.tasks h2,
+.completed-tasks h2 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.completed-tasks {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Task card styles */
+.task-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.task-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-title h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.task-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.task-description {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.task-actions button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.task-actions button:hover {
+    color: #333;
+}
+
+.task-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.tag.deadline {
+    background-color: #f0f0f0;
+    color: #666;
+}
+
+.tag.category {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+.tag.important {
+    background-color: #fce8e8;
+    color: #d93025;
+}
+
+/* Completed task styles */
+.task-card.completed {
+    opacity: 0.7;
+}
+
+.task-card.completed .task-title h3 {
+    text-decoration: line-through;
+    color: #666;
+}
+
+/* Completed section toggle */
+.completed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.completed-header h2 {
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.chevron {
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.chevron.rotated {
+    transform: rotate(180deg);
+}
+
+.completed-tasks-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.completed-tasks-content.visible {
+    max-height: 1000px;
+}
+
+/* Remove the fixed height and scrollbar from tasks container */
+.tasks {
+    padding-right: 10px;
+}
+
+/* Modal styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.modal-content h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #333;
+}
+
+.modal-content select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #333;
+    height: auto;
+}
+
+.modal-content select option {
+    padding: 8px;
+    color: #333;
+}
+
+.modal-content textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 10px 25px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.modal-actions button[type="submit"] {
+    background: linear-gradient(to right, #738fbd, #db88a4);
+    color: white;
+}
+
+.modal-actions button[type="button"] {
+    background: #ddd;
+    color: #666;
+}
+
+.modal-actions button:hover {
+    opacity: 0.9;
+}
+
+/* Checkbox group styles */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+/* Update task card action icons */
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.task-actions button {
+    background: transparent;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.task-actions button:hover {
+    opacity: 0.8;
+}
+
+.task-actions svg {
+    color: #333;
+    /* Changed to dark color */
+    font-size: 16px;
+    /* Adjust size as needed */
+}
+
+/* Date input styling */
+.date-category input[type="date"] {
+    position: relative;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+    background: white;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Remove default calendar icon */
+.date-category input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
+/* Task checkbox styles */
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.task-card.completed {
+    opacity: 0.7;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.task-card.completed h3 {
+    text-decoration: line-through;
+    color: #666;
+}
+
+.task-card.completed .task-description {
+    color: #888;
+}
+
+.task-card.completed .tag {
+    opacity: 0.8;
+}
+
+/* Tag styles */
+.tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tag.category {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+.tag.important {
+    background-color: #fce8e8;
+    color: #d93025;
+}
+
+.tag.calendar {
+    background-color: #e6f4ea;
+    color: #137333;
+}
