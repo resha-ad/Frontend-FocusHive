@@ -3,7 +3,7 @@ import '../../styles/Task.css';
 import beeImage from '../../assets/bee.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTasks, faProjectDiagram, faClock, faCalendar, faBullseye, faSearch, faPlus, faBars, faEdit, faTrash, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import Sidebar from '../private/Sidebar';
+import Sidebar from './Sidebar';
 
 const Task = () => {
     const [isExpanded, setIsExpanded] = useState(false);

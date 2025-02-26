@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faBars, faTasks, faProjectDiagram,
     faClock, faCalendar, faBullseye
 } from '@fortawesome/free-solid-svg-icons';
-import '../../styles/Sidebar.css'; // Import the scoped CSS for the sidebar
+import '../../styles/Sidebar.css'; // Import CSS of the sidebar
 
 const Sidebar = () => {
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
@@ -20,24 +21,34 @@ const Sidebar = () => {
                 <span>Menu</span>
             </div>
             <div className="nav-item">
-                <FontAwesomeIcon icon={faTasks} />
-                <span>Tasks</span>
+                <Link to="/task">
+                    <FontAwesomeIcon icon={faTasks} />
+                    <span>Tasks</span>
+                </Link>
             </div>
             <div className="nav-item">
-                <FontAwesomeIcon icon={faProjectDiagram} />
-                <span>Projects</span>
+                <Link to="/project">
+                    <FontAwesomeIcon icon={faProjectDiagram} />
+                    <span>Projects</span>
+                </Link>
             </div>
             <div className="nav-item">
-                <FontAwesomeIcon icon={faClock} />
-                <span>Timeline</span>
-            </div>
-            <div className="nav-item active">
-                <FontAwesomeIcon icon={faCalendar} />
-                <span>Calendar</span>
+                <Link to="/timeline">
+                    <FontAwesomeIcon icon={faClock} />
+                    <span>Timeline</span>
+                </Link>
             </div>
             <div className="nav-item">
-                <FontAwesomeIcon icon={faBullseye} />
-                <span>Focus</span>
+                <Link to="/calendar">
+                    <FontAwesomeIcon icon={faCalendar} />
+                    <span>Calendar</span>
+                </Link>
+            </div>
+            <div className="nav-item">
+                <Link to="/focustimer">
+                    <FontAwesomeIcon icon={faBullseye} />
+                    <span>Focus</span>
+                </Link>
             </div>
         </div>
     );

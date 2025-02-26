@@ -3,6 +3,7 @@
     display: flex;
     min-height: 100vh;
     background: linear-gradient(to right, #738fbd, #dbd4df, #db88a4);
+    overflow-y: auto;
 }
 
 /* Fixed sidebar */
