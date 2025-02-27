@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { isAuthenticated } from "./utils/auth";
 import Task from './components/private/Task';
 import LoginForm from './components/public/LoginForm';
 import Calendar from './components/private/Calendar';
