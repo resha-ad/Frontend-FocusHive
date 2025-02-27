@@ -244,51 +244,70 @@
     text-decoration: underline;
 }
 
-/* src/styles/Login.css */
+/* Modal styles */
 .modal {
-    display: flex;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999;
+    /* Increased z-index to ensure it's above everything */
 }
 
 .modal-content {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 2rem;
+    border-radius: 15px;
     max-width: 500px;
-    width: 100%;
-    text-align: left;
+    width: 90%;
+    position: relative;
+    z-index: 10000;
+    /* Higher than modal backdrop */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content h2 {
     color: #292421;
     margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
 
 .modal-content p {
     color: #666;
-    line-height: 1.5;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
 .modal-content button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
     background: #7A958F;
     color: white;
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .modal-content button:hover {
     background: #BAEDDA;
+}
+
+/* Terms link style */
+.terms-link {
+    color: #7A958F;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {

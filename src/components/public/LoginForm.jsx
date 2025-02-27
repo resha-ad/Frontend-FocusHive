@@ -1,12 +1,13 @@
 // src/components/private/Login.jsx
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../../styles/Login.css';
 import spreadsheets from '../../assets/spreadsheets.jpg';
 import desktoppink from '../../assets/desktoppink.jpg';
 import desk from '../../assets/desk.jpg'
 
 
-const Login = () => {
+const LoginForm = () => {
     const [currentImage, setCurrentImage] = useState(0);
     const [showLoginForm, setShowLoginForm] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -20,10 +21,6 @@ const Login = () => {
 
         return () => clearInterval(interval);
     }, [images.length]);
-
-    const handleToggleForm = () => {
-        setShowLoginForm(!showLoginForm);
-    };
 
     const handleTermsClick = (e) => {
         e.preventDefault();
@@ -72,8 +69,7 @@ const Login = () => {
             {/* Form Section */}
             <div className="split form-section">
                 <div className="form-container">
-                    {/* Login Form */}
-                    <form id="loginForm" onSubmit={handleLoginSubmit} style={{ display: showLoginForm ? 'block' : 'none' }}>
+                    <form id="loginForm" onSubmit={handleLoginSubmit}>
                         <div className="logo">
                             <h1>Focus Hive</h1>
                             <p>Continue your Productivity Journey</p>
@@ -87,13 +83,13 @@ const Login = () => {
                             <input type="password" id="loginPassword" required />
                         </div>
                         <div className="input-group">
-                            <a href="forgot-password.html" className="toggle-btn">Forgot Password?</a>
+                            <a href="#" className="toggle-btn">Forgot Password?</a>
                         </div>
                         <button type="submit" className="btn">Log In</button>
                         <div className="toggle-form">
-                            <button type="button" className="toggle-btn" onClick={handleToggleForm}>
+                            <Link to="/register" className="toggle-btn">
                                 Don't have an account? Sign up
-                            </button>
+                            </Link>
                         </div>
                     </form>
 
@@ -129,9 +125,9 @@ const Login = () => {
                         </div>
                         <button type="submit" className="btn">Sign Up</button>
                         <div className="toggle-form">
-                            <button type="button" className="toggle-btn" onClick={handleToggleForm}>
+                            <Link to="/login" className="toggle-btn">
                                 Already have an account? Log in
-                            </button>
+                            </Link>
                         </div>
                     </form>
                 </div>
@@ -156,4 +152,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginForm;
