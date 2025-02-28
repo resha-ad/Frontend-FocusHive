@@ -579,3 +579,40 @@ select.filter-btn option {
     background-color: #e6f4ea;
     color: #137333;
 }
+
+/* Styles for labeled inputs */
+.input-with-label {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.input-with-label label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+.date-category {
+    display: flex;
+    gap: 15px;
+}
+
+.date-category .input-with-label {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Ensure these inputs visually match the rest of your form */
+.input-with-label input,
+.input-with-label select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background: white;
+    width: 100%;
+}

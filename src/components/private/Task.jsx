@@ -30,6 +30,25 @@ const Task = () => {
         fetchTasks();
     }, [token]);
 
+    // Format date for input elements
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return '';
+
+        // If the date is already in YYYY-MM-DD format, return it
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+            return dateString;
+        }
+
+        // Try to parse the date and format it
+        try {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return '';
+        }
+    };
+
     const handleAddTask = async (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
@@ -257,18 +276,25 @@ const Task = () => {
                                     placeholder="Description (optional)"
                                 ></textarea>
                                 <div className="date-category">
-                                    <input
-                                        type="date"
-                                        name="deadline"
-                                        required
-                                    />
-                                    <select name="category" required>
-                                        <option value="">Select Category</option>
-                                        <option value="Work">Work</option>
-                                        <option value="Personal">Personal</option>
-                                        <option value="Study">Study</option>
-                                        <option value="General">General</option>
-                                    </select>
+                                    <div className="input-with-label">
+                                        <label htmlFor="add-deadline">Deadline Date:</label>
+                                        <input
+                                            id="add-deadline"
+                                            type="date"
+                                            name="deadline"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="input-with-label">
+                                        <label htmlFor="add-category">Category:</label>
+                                        <select id="add-category" name="category" required>
+                                            <option value="">Select Category</option>
+                                            <option value="Work">Work</option>
+                                            <option value="Personal">Personal</option>
+                                            <option value="Study">Study</option>
+                                            <option value="General">General</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="checkbox-group">
                                     <label>
@@ -315,23 +341,31 @@ const Task = () => {
                                     defaultValue={selectedTask.description}
                                 ></textarea>
                                 <div className="date-category">
-                                    <input
-                                        type="date"
-                                        name="deadline"
-                                        defaultValue={selectedTask.deadline}
-                                        required
-                                    />
-                                    <select
-                                        name="category"
-                                        defaultValue={selectedTask.category}
-                                        required
-                                    >
-                                        <option value="">Select Category</option>
-                                        <option value="Work">Work</option>
-                                        <option value="Personal">Personal</option>
-                                        <option value="Study">Study</option>
-                                        <option value="General">General</option>
-                                    </select>
+                                    <div className="input-with-label">
+                                        <label htmlFor="update-deadline">Deadline Date:</label>
+                                        <input
+                                            id="update-deadline"
+                                            type="date"
+                                            name="deadline"
+                                            defaultValue={formatDateForInput(selectedTask.deadline)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="input-with-label">
+                                        <label htmlFor="update-category">Category:</label>
+                                        <select
+                                            id="update-category"
+                                            name="category"
+                                            defaultValue={selectedTask.category}
+                                            required
+                                        >
+                                            <option value="">Select Category</option>
+                                            <option value="Work">Work</option>
+                                            <option value="Personal">Personal</option>
+                                            <option value="Study">Study</option>
+                                            <option value="General">General</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="checkbox-group">
                                     <label>
