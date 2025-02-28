@@ -194,6 +194,10 @@ select.filter-btn {
     background-size: 20px;
 }
 
+select.filter-btn option {
+    color: #333;
+}
+
 /* Tasks sections */
 .tasks h2,
 .completed-tasks h2 {
@@ -270,6 +274,12 @@ select.filter-btn {
 .task-actions button:hover {
     color: #333;
 }
+
+/* Add spacing at the bottom when no completed tasks */
+.tasks-bottom-padding {
+    padding-bottom: 40px;
+}
+
 
 .task-tags {
     display: flex;

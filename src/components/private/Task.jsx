@@ -14,6 +14,7 @@ const Task = () => {
     const [selectedTask, setSelectedTask] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentFilter, setCurrentFilter] = useState('all');
+    const [categoryFilter, setCategoryFilter] = useState('');
     const [isCompletedVisible, setIsCompletedVisible] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('token'));
 
@@ -43,7 +44,7 @@ const Task = () => {
         try {
             const addedTask = await taskService.addTask(newTask, token);
             setTasks([...tasks, addedTask]);
-            closeAddModal();
+            setIsAddModalOpen(false); // Close the modal after adding
             event.target.reset();
         } catch (error) {
             console.error('Error adding task:', error);
@@ -54,6 +55,7 @@ const Task = () => {
         event.preventDefault();
         const formData = new FormData(event.target);
         const updatedTask = {
+            ...selectedTask,
             title: formData.get('title'),
             description: formData.get('description'),
             deadline: formData.get('deadline'),
@@ -64,7 +66,7 @@ const Task = () => {
         try {
             const updated = await taskService.updateTask(selectedTask.id, updatedTask, token);
             setTasks(tasks.map(task => task.id === selectedTask.id ? updated : task));
-            closeUpdateModal();
+            setIsUpdateModalOpen(false); // Close the modal after updating
         } catch (error) {
             console.error('Error updating task:', error);
         }
@@ -90,16 +92,44 @@ const Task = () => {
         }
     };
 
+    const openUpdateModal = (task) => {
+        setSelectedTask(task);
+        setIsUpdateModalOpen(true);
+    };
+
+    const closeAddModal = () => {
+        setIsAddModalOpen(false);
+    };
+
+    const closeUpdateModal = () => {
+        setSelectedTask(null);
+        setIsUpdateModalOpen(false);
+    };
+
+    const handleCategoryFilterChange = (e) => {
+        setCategoryFilter(e.target.value);
+        if (e.target.value) {
+            setCurrentFilter('category');
+        } else {
+            setCurrentFilter('all');
+        }
+    };
+
     const filteredTasks = tasks.filter(task => {
+        // Filter by search query
         const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = currentFilter === 'all' ||
+
+        // Filter by category or importance
+        const matchesFilter =
+            currentFilter === 'all' ||
             (currentFilter === 'important' && task.important) ||
-            (currentFilter === 'category' && task.category === document.getElementById('categoryFilter').value);
+            (currentFilter === 'category' && task.category === categoryFilter);
+
         return matchesSearch && matchesFilter;
     });
 
-    const activeTasks = tasks.filter(task => !task.completed);
-    const completedTasks = tasks.filter(task => task.completed);
+    const activeTasks = filteredTasks.filter(task => !task.completed);
+    const completedTasks = filteredTasks.filter(task => task.completed);
 
     const renderTaskCard = (task) => (
         <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''}`}>
@@ -116,7 +146,7 @@ const Task = () => {
                     </div>
                     <div className="task-actions">
                         {!task.completed && (
-                            <button onClick={() => setSelectedTask(task)}>
+                            <button onClick={() => openUpdateModal(task)}>
                                 <FontAwesomeIcon icon={faEdit} />
                             </button>
                         )}
@@ -174,7 +204,12 @@ const Task = () => {
                 <div className="filters">
                     <button className={`filter-btn ${currentFilter === 'all' ? 'active' : ''}`} onClick={() => setCurrentFilter('all')}>All</button>
                     <button className={`filter-btn ${currentFilter === 'important' ? 'active' : ''}`} onClick={() => setCurrentFilter('important')}>Important</button>
-                    <select id="categoryFilter" className="filter-btn" onChange={() => setCurrentFilter('category')}>
+                    <select
+                        id="categoryFilter"
+                        className="filter-btn"
+                        value={categoryFilter}
+                        onChange={handleCategoryFilterChange}
+                    >
                         <option value="">Select Category</option>
                         <option value="Work">Work</option>
                         <option value="Personal">Personal</option>
@@ -186,6 +221,8 @@ const Task = () => {
                 <div className="tasks">
                     <h2>Active Tasks</h2>
                     {activeTasks.map(renderTaskCard)}
+                    {/* Added bottom padding when no completed tasks */}
+                    {completedTasks.length === 0 && <div className="tasks-bottom-padding"></div>}
                 </div>
 
                 {completedTasks.length > 0 && (
@@ -251,7 +288,7 @@ const Task = () => {
                                 </div>
                                 <div className="modal-actions">
                                     <button type="submit">Add Task</button>
-                                    <button type="button" onClick={() => setIsAddModalOpen(false)}>
+                                    <button type="button" onClick={closeAddModal}>
                                         Cancel
                                     </button>
                                 </div>
@@ -261,7 +298,7 @@ const Task = () => {
                 )}
 
                 {isUpdateModalOpen && selectedTask && (
-                    <div className="modal">
+                    <div className="modal" style={{ display: 'flex' }}>
                         <div className="modal-content">
                             <h2>Update Task</h2>
                             <form onSubmit={handleUpdateTask}>
@@ -318,7 +355,7 @@ const Task = () => {
                                     <button type="submit">Update Task</button>
                                     <button
                                         type="button"
-                                        onClick={() => setIsUpdateModalOpen(false)}
+                                        onClick={closeUpdateModal}
                                     >
                                         Cancel
                                     </button>
