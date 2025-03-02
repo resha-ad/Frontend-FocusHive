@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faRedo, faCog } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/FocusTimer.css';
-import Sidebar from './Sidebar'; // Import the Sidebar component
+import Sidebar from './Sidebar';
+import focusTimerService from '../../services/focusTimerService'; // Import the service
 
 // Import images
 import purpleSkyImg from '../../assets/themepurplesky.jpeg';
@@ -38,12 +39,32 @@ const FocusTimer = () => {
         office: officeImg,
     };
 
+    // Get token from localStorage
+    const token = localStorage.getItem('token');
+
     // Format time to display (MM:SS)
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
+
+    // Fetch settings when the component mounts
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await focusTimerService.getSettings(token);
+                if (response.focusTimer) {
+                    setPomodoroDuration(response.focusTimer.pomodoroDuration);
+                    setShortBreakDuration(response.focusTimer.shortBreakDuration);
+                    setLongBreakDuration(response.focusTimer.longBreakDuration);
+                }
+            } catch (error) {
+                console.error("Error fetching settings:", error);
+            }
+        };
+        fetchSettings();
+    }, [token]);
 
     // Timer logic
     useEffect(() => {
@@ -54,6 +75,7 @@ const FocusTimer = () => {
                         clearInterval(timerIntervalRef.current);
                         playSound();
                         setIsRunning(false);
+                        saveSession(); // Save session when timer ends
                         return 0;
                     }
                     return prev - 1;
@@ -65,6 +87,15 @@ const FocusTimer = () => {
 
         return () => clearInterval(timerIntervalRef.current);
     }, [isRunning]);
+
+    // Save session when timer ends
+    const saveSession = async () => {
+        try {
+            await focusTimerService.saveSession(pomodoroDuration, token);
+        } catch (error) {
+            console.error("Error saving session:", error);
+        }
+    };
 
     // Set mode (pomodoro, short break, long break)
     const handleSetMode = (mode) => {
@@ -107,9 +138,17 @@ const FocusTimer = () => {
     };
 
     // Handle settings save
-    const saveSettings = () => {
-        setShowSettings(false);
-        handleSetMode(currentMode);
+    const handleSaveSettings = async () => {
+        try {
+            await focusTimerService.saveSettings(
+                { pomodoroDuration, shortBreakDuration, longBreakDuration },
+                token
+            );
+            setShowSettings(false);
+            handleSetMode(currentMode);
+        } catch (error) {
+            console.error("Error saving settings:", error);
+        }
     };
 
     // Change theme
@@ -170,7 +209,7 @@ const FocusTimer = () => {
             {/* Settings Modal */}
             {showSettings && (
                 <div className="focus-timer-modal" onClick={(e) => {
-                    if (e.target.className === 'focus-timer-modal') saveSettings();
+                    if (e.target.className === 'focus-timer-modal') handleSaveSettings();
                 }}>
                     <div className="focus-timer-modal-content">
                         <h3 className="focus-timer-modal-title">Settings</h3>
@@ -223,7 +262,7 @@ const FocusTimer = () => {
                         </div>
 
                         <div className="focus-timer-modal-footer">
-                            <button className="focus-timer-save-btn" onClick={saveSettings}>
+                            <button className="focus-timer-save-btn" onClick={handleSaveSettings}>
                                 Save Changes
                             </button>
                         </div>

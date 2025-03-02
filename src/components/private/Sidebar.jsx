@@ -27,18 +27,6 @@ const Sidebar = () => {
                 </Link>
             </div>
             <div className="nav-item">
-                <Link to="/project">
-                    <FontAwesomeIcon icon={faProjectDiagram} />
-                    <span>Projects</span>
-                </Link>
-            </div>
-            <div className="nav-item">
-                <Link to="/timeline">
-                    <FontAwesomeIcon icon={faClock} />
-                    <span>Timeline</span>
-                </Link>
-            </div>
-            <div className="nav-item">
                 <Link to="/calendar">
                     <FontAwesomeIcon icon={faCalendar} />
                     <span>Calendar</span>
