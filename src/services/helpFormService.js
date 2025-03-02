@@ -43,3 +43,16 @@ export const updateRemarks = async (id, remarks) => {
         throw error.response?.data?.message || "Failed to update remarks";
     }
 };
+
+// Delete Help Form by Admin
+export const deleteHelpForm = async (id) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.delete(`${API_URL}/delete/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data; // Returns the deletion success message
+    } catch (error) {
+        throw error.response?.data?.message || "Failed to delete help form";
+    }
+};

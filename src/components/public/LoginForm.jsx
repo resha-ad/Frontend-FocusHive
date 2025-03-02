@@ -32,6 +32,7 @@ const LoginForm = () => {
         return regex.test(email);
     };
 
+    // LoginForm.jsx
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -47,17 +48,24 @@ const LoginForm = () => {
         }
 
         try {
-            const { token } = await login(email, password);
+            // Destructure both user and token from the response
+            const { user, token } = await login(email, password);
+
+            // Save the token to localStorage
             saveToken(token);
+
+            // Show success message
             toast.success("Successfully logged in!", {
                 position: "top-center",
                 autoClose: 3000,
             });
+
+            // Redirect based on user role
             setTimeout(() => {
                 if (user.isAdmin) {
                     navigate("/admin-dashboard"); // Redirect to admin dashboard
                 } else {
-                    navigate("/homepage"); // Redirect to task page for regular users
+                    navigate("/homepage"); // Redirect to homepage for regular users
                 }
             }, 3000);
         } catch (error) {
@@ -66,6 +74,7 @@ const LoginForm = () => {
             toast.error(typeof error === "string" ? error : "Login failed. Please try again.");
         }
     };
+
 
     return (
         <>

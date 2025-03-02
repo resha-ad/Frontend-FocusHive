@@ -7,6 +7,8 @@ import FocusTimer from './components/private/FocusTimer';
 import Register from './components/public/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Homepage from './components/public/Homepage';
+import AdminDashboard from './components/private/AdminDashboard';
+
 
 const App = () => {
   return (
@@ -22,6 +24,7 @@ const App = () => {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/focustimer" element={<FocusTimer />} />
           <Route path="/task" element={<Task />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Route>
 
         {/* Default Redirect to Login */}

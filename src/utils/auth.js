@@ -38,3 +38,16 @@ export const isAuthenticated = () => {
         return false;
     }
 };
+
+export const isAdmin = () => {
+    const token = getToken();
+    if (!token) return false;
+
+    try {
+        const decodedToken = jwtDecode(token);
+        return decodedToken.isAdmin === true; // Check the isAdmin claim in the token
+    } catch (error) {
+        console.error("Error decoding token:", error);
+        return false;
+    }
+};
