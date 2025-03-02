@@ -12,7 +12,7 @@ import meadowImg from '../../assets/thememeadow.jpeg';
 import oceanImg from '../../assets/themeocean.jpeg';
 import greenImg from '../../assets/themegreen.jpeg';
 import officeImg from '../../assets/themeoffice.jpeg';
-import beeImg from '../../assets/bee.png'; // Add bee image for streak icon
+import bulbImg from '../../assets/icon_streak.png'; // Add bee image for streak icon
 
 const FocusTimer = () => {
     // State variables
@@ -32,6 +32,9 @@ const FocusTimer = () => {
 
     // Timer interval reference
     const timerIntervalRef = useRef(null);
+
+    console.log("Sessions:", sessions);//debug
+    console.log("Saving session for mode:", currentMode);
 
     // Themes mapping
     const themes = {
@@ -65,11 +68,12 @@ const FocusTimer = () => {
                     setLongBreakDuration(settingsResponse.focusTimer.longBreakDuration);
                 }
 
-                // Fetch sessions
+                // Fetch sessions and filter out null durations
                 const sessionsResponse = await focusTimerService.getSessions(token);
                 if (sessionsResponse && sessionsResponse.sessions) {
-                    setSessions(sessionsResponse.sessions);
-                    setTotalSessions(sessionsResponse.sessions.length);
+                    const validSessions = sessionsResponse.sessions.filter(session => session.sessionDuration !== null);
+                    setSessions(validSessions);
+                    setTotalSessions(validSessions.length);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -78,7 +82,9 @@ const FocusTimer = () => {
         fetchData();
     }, [token]);
 
-    // Timer logic
+    const isSessionSaved = useRef(false); // Track if the session has been saved
+    const isSavingSession = useRef(false); // Track if the session is being saved
+
     useEffect(() => {
         if (isRunning) {
             timerIntervalRef.current = setInterval(() => {
@@ -87,7 +93,13 @@ const FocusTimer = () => {
                         clearInterval(timerIntervalRef.current);
                         playSound();
                         setIsRunning(false);
-                        saveSession(); // Save session when timer ends
+
+                        // Save session only if the current mode is Pomodoro and the session hasn't been saved yet
+                        if (currentMode === 'pomodoro' && !isSessionSaved.current) {
+                            isSessionSaved.current = true; // Mark the session as saved
+                            saveSession();
+                        }
+
                         return 0;
                     }
                     return prev - 1;
@@ -97,35 +109,66 @@ const FocusTimer = () => {
             clearInterval(timerIntervalRef.current);
         }
 
-        return () => clearInterval(timerIntervalRef.current);
-    }, [isRunning]);
+        // Reset isSessionSaved when the mode changes
+        return () => {
+            clearInterval(timerIntervalRef.current);
+            isSessionSaved.current = false; // Reset the saved flag
+        };
+    }, [isRunning, currentMode]); // Add currentMode to dependencies
 
-    // Save session when timer ends
     const saveSession = async () => {
+        if (isSavingSession.current) return; // Exit if the session is already being saved
+        isSavingSession.current = true; // Mark the session as being saved
+
+        console.log("Saving session for mode:", currentMode); // Debug log
         try {
             if (currentMode === 'pomodoro') {
-                const response = await focusTimerService.saveSession(pomodoroDuration, token);
-                // Refresh sessions list
-                const sessionsResponse = await focusTimerService.getSessions(token);
-                if (sessionsResponse && sessionsResponse.sessions) {
-                    setSessions(sessionsResponse.sessions);
-                    setTotalSessions(sessionsResponse.sessions.length);
+                const duration = pomodoroDuration;
+                if (duration && duration > 0) {
+                    // Check if a session with the same duration and date already exists
+                    const existingSession = sessions.find(
+                        (session) =>
+                            session.sessionDuration === duration &&
+                            new Date(session.sessionDate).toISOString() === new Date().toISOString()
+                    );
+
+                    if (!existingSession) {
+                        const response = await focusTimerService.saveSession(duration, token);
+                        console.log("Session saved:", response); // Debug log
+
+                        // Refresh sessions list and filter out null durations
+                        const sessionsResponse = await focusTimerService.getSessions(token);
+                        if (sessionsResponse && sessionsResponse.sessions) {
+                            const validSessions = sessionsResponse.sessions.filter(session => session.sessionDuration !== null);
+                            setSessions(validSessions);
+                            setTotalSessions(validSessions.length);
+                        }
+                    } else {
+                        console.log("Session already exists:", existingSession);
+                    }
+                } else {
+                    console.error("Invalid session duration:", duration);
                 }
             }
         } catch (error) {
             console.error("Error saving session:", error);
+        } finally {
+            isSavingSession.current = false; // Reset the saving flag
         }
     };
 
     // Delete session
     const deleteSession = async (sessionId) => {
+        console.log("Deleting session with ID:", sessionId); // Debug log
         try {
             await focusTimerService.deleteSession(sessionId, token);
-            // Refresh sessions after deletion
+
+            // Refresh sessions after deletion and filter out null durations
             const sessionsResponse = await focusTimerService.getSessions(token);
             if (sessionsResponse && sessionsResponse.sessions) {
-                setSessions(sessionsResponse.sessions);
-                setTotalSessions(sessionsResponse.sessions.length);
+                const validSessions = sessionsResponse.sessions.filter(session => session.sessionDuration !== null);
+                setSessions(validSessions);
+                setTotalSessions(validSessions.length);
             }
         } catch (error) {
             console.error("Error deleting session:", error);
@@ -272,7 +315,7 @@ const FocusTimer = () => {
                         </div>
 
                         <div className="focus-timer-streak" onClick={() => setShowSessions(true)}>
-                            <img src={beeImg} alt="Bee" className="focus-timer-bee-icon" />
+                            <img src={bulbImg} alt="Bee" className="focus-timer-bee-icon" />
                             <span className="focus-timer-streak-count">{totalSessions}</span>
                         </div>
 
@@ -358,7 +401,6 @@ const FocusTimer = () => {
                 </div>
             )}
 
-            {/* Sessions Modal */}
             {showSessions && (
                 <div className="focus-timer-modal" onClick={(e) => {
                     if (e.target.className === 'focus-timer-modal') setShowSessions(false);
@@ -367,7 +409,7 @@ const FocusTimer = () => {
                         <div className="focus-timer-sessions-header">
                             <h3 className="focus-timer-modal-title">Focus Sessions</h3>
                             <div className="focus-timer-sessions-summary">
-                                <img src={beeImg} alt="Bee" className="focus-timer-bee-icon-large" />
+                                <img src={bulbImg} alt="Bee" className="focus-timer-bee-icon-large" />
                                 <span className="focus-timer-sessions-count">{totalSessions} sessions completed</span>
                             </div>
                         </div>
@@ -379,18 +421,18 @@ const FocusTimer = () => {
                                 </div>
                             ) : (
                                 sessions.map((session) => (
-                                    <div className="focus-timer-session-item" key={session._id}>
+                                    <div className="focus-timer-session-item" key={session.id}>
                                         <div className="focus-timer-session-info">
                                             <div className="focus-timer-session-duration">
-                                                {session.duration} minutes
+                                                {session.sessionDuration} minutes
                                             </div>
                                             <div className="focus-timer-session-date">
-                                                {formatDate(session.createdAt)}
+                                                {formatDate(session.sessionDate || session.createdAt)}
                                             </div>
                                         </div>
                                         <button
                                             className="focus-timer-delete-btn"
-                                            onClick={() => deleteSession(session._id)}
+                                            onClick={() => deleteSession(session.id)}
                                         >
                                             <FontAwesomeIcon icon={faTrash} />
                                         </button>

@@ -6,6 +6,7 @@ import Calendar from './components/private/Calendar';
 import FocusTimer from './components/private/FocusTimer';
 import Register from './components/public/Register';
 import ProtectedRoute from './components/ProtectedRoute';
+import Homepage from './components/public/Homepage';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         {/* Public Routes */}
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/homepage" element={<Homepage />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>

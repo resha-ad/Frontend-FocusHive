@@ -38,4 +38,13 @@ const getSessions = async (token) => {
     return response.data;
 };
 
-export default { saveSettings, saveSession, getSettings, getSessions };
+// delete session
+const deleteSession = async (sessionId, token) => {
+    const config = {
+        headers: { Authorization: `Bearer ${token}` },
+    };
+    const response = await axios.delete(`${API_URL}/session/${sessionId}`, config);
+    return response.data;
+};
+
+export default { saveSettings, saveSession, getSettings, getSessions, deleteSession };
