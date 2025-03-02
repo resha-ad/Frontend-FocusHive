@@ -140,14 +140,35 @@ const FocusTimer = () => {
     // Handle settings save
     const handleSaveSettings = async () => {
         try {
+            // Save new settings
             await focusTimerService.saveSettings(
                 { pomodoroDuration, shortBreakDuration, longBreakDuration },
                 token
             );
+
+            // Fetch the latest settings from the backend
+            const response = await focusTimerService.getSettings(token);
+            if (response.focusTimer) {
+                setPomodoroDuration(response.focusTimer.pomodoroDuration || 25);
+                setShortBreakDuration(response.focusTimer.shortBreakDuration || 5);
+                setLongBreakDuration(response.focusTimer.longBreakDuration || 15);
+            }
+
+            // Close settings modal and update timer
             setShowSettings(false);
             handleSetMode(currentMode);
+
+            // Show success message
+            toast.success("Settings saved successfully! 🎉", {
+                position: "top-center",
+                autoClose: 3000,
+            });
         } catch (error) {
             console.error("Error saving settings:", error);
+            toast.error("Failed to save settings. Please try again.", {
+                position: "top-center",
+                autoClose: 3000,
+            });
         }
     };
 
