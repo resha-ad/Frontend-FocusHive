@@ -13,9 +13,21 @@
     background: rgba(0, 0, 0, 0.3);
 }
 
+/* Ensure the container is in the second column */
+.focus-timer-container {
+    grid-column: 2;
+}
+
 .focus-timer-layout.expanded {
     grid-template-columns: 200px 1fr;
 }
+
+/* When sidebar is expanded */
+.focus-timer-layout.expanded .focus-timer-container {
+    width: calc(100% - 200px);
+    margin-left: 200px;
+}
+
 
 .focus-timer-sidebar {
     background: rgba(255, 255, 255, 0.8);
@@ -68,19 +80,27 @@
     color: #738fbd;
 }
 
+/* Fixed container for centering */
+.focus-timer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: calc(100% - 60px);
+    /* Subtract sidebar width from total width */
+    margin-left: 60px;
+    /* Offset by sidebar width */
+}
+
 .focus-timer-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    margin-left: 750px;
-    margin-right: auto;
-    width: calc(100% - 60px);
-    max-width: 800px;
-    height: 100vh;
-    position: center;
-    left: 30px;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
     z-index: 1;
 }
 
@@ -97,7 +117,7 @@
 
 .focus-timer-mode-buttons {
     display: flex;
-    gap: 3rem;
+    gap: 1rem;
     margin-bottom: 2rem;
     justify-content: center;
     width: 100%;
@@ -159,6 +179,69 @@
     transform: scale(1.1);
 }
 
+.focus-timer-control-btn-main {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+}
+
+/* Streak counter styles */
+.focus-timer-streak {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 1.5rem;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.focus-timer-streak:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.focus-timer-bee-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 0.5rem;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+    animation: float 3s ease-in-out infinite;
+}
+
+.focus-timer-bee-icon-large {
+    width: 60px;
+    height: 60px;
+    margin-right: 1rem;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.focus-timer-streak-count {
+    font-weight: bold;
+    color: white;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
 .focus-timer-modal {
     display: flex;
     position: fixed;
@@ -180,12 +263,27 @@
     width: 90%;
     max-width: 500px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modalAppear 0.3s ease-out forwards;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .focus-timer-modal-title {
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
+    color: #333;
 }
 
 .focus-timer-setting-section {
@@ -196,6 +294,7 @@
     font-size: 1.125rem;
     font-weight: 500;
     margin-bottom: 0.75rem;
+    color: #555;
 }
 
 .focus-timer-duration-inputs {
@@ -216,12 +315,15 @@
     padding: 0.5rem;
     border: 1px solid #e2e8f0;
     border-radius: 0.25rem;
+    text-align: center;
+    font-size: 1rem;
 }
 
 .focus-timer-theme-options {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+    justify-content: center;
 }
 
 .focus-timer-theme-option {
@@ -259,11 +361,116 @@
     border: none;
     cursor: pointer;
     font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .focus-timer-save-btn:hover {
     opacity: 0.9;
     transform: translateY(-2px);
+}
+
+/* Sessions Modal specific styles */
+.focus-timer-sessions-modal {
+    max-width: 550px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.focus-timer-sessions-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.focus-timer-sessions-summary {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.focus-timer-sessions-count {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.focus-timer-sessions-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding-right: 5px;
+}
+
+.focus-timer-sessions-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.focus-timer-sessions-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.focus-timer-sessions-list::-webkit-scrollbar-thumb {
+    background: rgba(115, 143, 189, 0.5);
+    border-radius: 10px;
+}
+
+.focus-timer-session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: rgba(115, 143, 189, 0.1);
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.focus-timer-session-item:hover {
+    background: rgba(115, 143, 189, 0.2);
+}
+
+.focus-timer-session-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.focus-timer-session-duration {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.focus-timer-session-date {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.focus-timer-delete-btn {
+    color: #db88a4;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+    opacity: 0.7;
+}
+
+.focus-timer-delete-btn:hover {
+    background: rgba(219, 136, 164, 0.1);
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.focus-timer-no-sessions {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
 }
 
 /* Toast message styles */
@@ -290,6 +497,7 @@
     margin: 20px 0;
 }
 
+/* Responsive styles */
 @media (max-width: 768px) {
     .focus-timer-display {
         font-size: 5rem;
@@ -297,5 +505,69 @@
 
     .focus-timer-duration-inputs {
         grid-template-columns: 1fr;
+    }
+
+    .focus-timer-mode-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .focus-timer-mode-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .focus-timer-layout {
+        grid-template-columns: 0 1fr;
+    }
+
+    .focus-timer-layout.expanded {
+        grid-template-columns: 100% 0;
+        position: relative;
+    }
+
+    .focus-timer-sidebar {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        z-index: 20;
+    }
+
+    .focus-timer-content {
+        padding: 1rem;
+    }
+
+    .focus-timer-theme-options {
+        gap: 0.5rem;
+    }
+
+    .focus-timer-theme-option {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .focus-timer-display {
+        font-size: 4rem;
+    }
+
+    .focus-timer-controls {
+        gap: 0.5rem;
+    }
+
+    .focus-timer-control-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .focus-timer-control-btn-main {
+        width: 50px;
+        height: 50px;
+    }
+
+    .focus-timer-modal-content {
+        padding: 1.5rem;
     }
 }

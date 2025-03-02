@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faRedo, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faRedo, faCog, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/FocusTimer.css';
 import Sidebar from './Sidebar';
 import focusTimerService from '../../services/focusTimerService'; // Import the service
@@ -12,6 +12,7 @@ import meadowImg from '../../assets/thememeadow.jpeg';
 import oceanImg from '../../assets/themeocean.jpeg';
 import greenImg from '../../assets/themegreen.jpeg';
 import officeImg from '../../assets/themeoffice.jpeg';
+import beeImg from '../../assets/bee.png'; // Add bee image for streak icon
 
 const FocusTimer = () => {
     // State variables
@@ -20,6 +21,9 @@ const FocusTimer = () => {
     const [isRunning, setIsRunning] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [currentTheme, setCurrentTheme] = useState('purplesky');
+    const [showSessions, setShowSessions] = useState(false);
+    const [sessions, setSessions] = useState([]);
+    const [totalSessions, setTotalSessions] = useState(0);
 
     // Timer settings
     const [pomodoroDuration, setPomodoroDuration] = useState(25);
@@ -49,21 +53,29 @@ const FocusTimer = () => {
         return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
 
-    // Fetch settings when the component mounts
+    // Fetch settings and sessions when the component mounts
     useEffect(() => {
-        const fetchSettings = async () => {
+        const fetchData = async () => {
             try {
-                const response = await focusTimerService.getSettings(token);
-                if (response.focusTimer) {
-                    setPomodoroDuration(response.focusTimer.pomodoroDuration);
-                    setShortBreakDuration(response.focusTimer.shortBreakDuration);
-                    setLongBreakDuration(response.focusTimer.longBreakDuration);
+                // Fetch settings
+                const settingsResponse = await focusTimerService.getSettings(token);
+                if (settingsResponse.focusTimer) {
+                    setPomodoroDuration(settingsResponse.focusTimer.pomodoroDuration);
+                    setShortBreakDuration(settingsResponse.focusTimer.shortBreakDuration);
+                    setLongBreakDuration(settingsResponse.focusTimer.longBreakDuration);
+                }
+
+                // Fetch sessions
+                const sessionsResponse = await focusTimerService.getSessions(token);
+                if (sessionsResponse && sessionsResponse.sessions) {
+                    setSessions(sessionsResponse.sessions);
+                    setTotalSessions(sessionsResponse.sessions.length);
                 }
             } catch (error) {
-                console.error("Error fetching settings:", error);
+                console.error("Error fetching data:", error);
             }
         };
-        fetchSettings();
+        fetchData();
     }, [token]);
 
     // Timer logic
@@ -91,9 +103,32 @@ const FocusTimer = () => {
     // Save session when timer ends
     const saveSession = async () => {
         try {
-            await focusTimerService.saveSession(pomodoroDuration, token);
+            if (currentMode === 'pomodoro') {
+                const response = await focusTimerService.saveSession(pomodoroDuration, token);
+                // Refresh sessions list
+                const sessionsResponse = await focusTimerService.getSessions(token);
+                if (sessionsResponse && sessionsResponse.sessions) {
+                    setSessions(sessionsResponse.sessions);
+                    setTotalSessions(sessionsResponse.sessions.length);
+                }
+            }
         } catch (error) {
             console.error("Error saving session:", error);
+        }
+    };
+
+    // Delete session
+    const deleteSession = async (sessionId) => {
+        try {
+            await focusTimerService.deleteSession(sessionId, token);
+            // Refresh sessions after deletion
+            const sessionsResponse = await focusTimerService.getSessions(token);
+            if (sessionsResponse && sessionsResponse.sessions) {
+                setSessions(sessionsResponse.sessions);
+                setTotalSessions(sessionsResponse.sessions.length);
+            }
+        } catch (error) {
+            console.error("Error deleting session:", error);
         }
     };
 
@@ -158,23 +193,45 @@ const FocusTimer = () => {
             setShowSettings(false);
             handleSetMode(currentMode);
 
-            // Show success message
-            toast.success("Settings saved successfully! 🎉", {
-                position: "top-center",
-                autoClose: 3000,
-            });
+            // Show success message if toast is imported
+            if (typeof toast !== 'undefined') {
+                toast.success("Settings saved successfully! 🎉", {
+                    position: "top-center",
+                    autoClose: 3000,
+                });
+            }
         } catch (error) {
             console.error("Error saving settings:", error);
-            toast.error("Failed to save settings. Please try again.", {
-                position: "top-center",
-                autoClose: 3000,
-            });
+            if (typeof toast !== 'undefined') {
+                toast.error("Failed to save settings. Please try again.", {
+                    position: "top-center",
+                    autoClose: 3000,
+                });
+            }
         }
     };
 
     // Change theme
     const changeTheme = (themeName) => {
         setCurrentTheme(themeName);
+    };
+
+    // Format date for session display
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    // Validate timer duration inputs
+    const validateDuration = (value) => {
+        const numValue = parseInt(value) || 1;
+        return Math.min(numValue, 999); // Max 3 digits
     };
 
     return (
@@ -187,42 +244,49 @@ const FocusTimer = () => {
                 <Sidebar />
 
                 {/* Main Content */}
-                <div className="focus-timer-content">
-                    <div className="focus-timer-mode-buttons">
-                        <button
-                            className={`focus-timer-mode-btn ${currentMode === 'pomodoro' ? 'active' : ''}`}
-                            onClick={() => handleSetMode('pomodoro')}
-                        >
-                            Focus
-                        </button>
-                        <button
-                            className={`focus-timer-mode-btn ${currentMode === 'shortBreak' ? 'active' : ''}`}
-                            onClick={() => handleSetMode('shortBreak')}
-                        >
-                            Short Break
-                        </button>
-                        <button
-                            className={`focus-timer-mode-btn ${currentMode === 'longBreak' ? 'active' : ''}`}
-                            onClick={() => handleSetMode('longBreak')}
-                        >
-                            Long Break
-                        </button>
-                    </div>
+                <div className="focus-timer-container">
+                    <div className="focus-timer-content">
+                        <div className="focus-timer-mode-buttons">
+                            <button
+                                className={`focus-timer-mode-btn ${currentMode === 'pomodoro' ? 'active' : ''}`}
+                                onClick={() => handleSetMode('pomodoro')}
+                            >
+                                Focus
+                            </button>
+                            <button
+                                className={`focus-timer-mode-btn ${currentMode === 'shortBreak' ? 'active' : ''}`}
+                                onClick={() => handleSetMode('shortBreak')}
+                            >
+                                Short Break
+                            </button>
+                            <button
+                                className={`focus-timer-mode-btn ${currentMode === 'longBreak' ? 'active' : ''}`}
+                                onClick={() => handleSetMode('longBreak')}
+                            >
+                                Long Break
+                            </button>
+                        </div>
 
-                    <div className="focus-timer-display">
-                        {formatTime(timeLeft)}
-                    </div>
+                        <div className="focus-timer-display">
+                            {formatTime(timeLeft)}
+                        </div>
 
-                    <div className="focus-timer-controls">
-                        <button className="focus-timer-control-btn" onClick={resetTimer}>
-                            <FontAwesomeIcon icon={faRedo} />
-                        </button>
-                        <button className="focus-timer-control-btn" onClick={toggleTimer}>
-                            <FontAwesomeIcon icon={isRunning ? faPause : faPlay} />
-                        </button>
-                        <button className="focus-timer-control-btn" onClick={() => setShowSettings(true)}>
-                            <FontAwesomeIcon icon={faCog} />
-                        </button>
+                        <div className="focus-timer-streak" onClick={() => setShowSessions(true)}>
+                            <img src={beeImg} alt="Bee" className="focus-timer-bee-icon" />
+                            <span className="focus-timer-streak-count">{totalSessions}</span>
+                        </div>
+
+                        <div className="focus-timer-controls">
+                            <button className="focus-timer-control-btn" onClick={resetTimer}>
+                                <FontAwesomeIcon icon={faRedo} />
+                            </button>
+                            <button className="focus-timer-control-btn focus-timer-control-btn-main" onClick={toggleTimer}>
+                                <FontAwesomeIcon icon={isRunning ? faPause : faPlay} />
+                            </button>
+                            <button className="focus-timer-control-btn" onClick={() => setShowSettings(true)}>
+                                <FontAwesomeIcon icon={faCog} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -230,9 +294,9 @@ const FocusTimer = () => {
             {/* Settings Modal */}
             {showSettings && (
                 <div className="focus-timer-modal" onClick={(e) => {
-                    if (e.target.className === 'focus-timer-modal') handleSaveSettings();
+                    if (e.target.className === 'focus-timer-modal') setShowSettings(false);
                 }}>
-                    <div className="focus-timer-modal-content">
+                    <div className="focus-timer-modal-content" onClick={(e) => e.stopPropagation()}>
                         <h3 className="focus-timer-modal-title">Settings</h3>
 
                         <div className="focus-timer-setting-section">
@@ -243,8 +307,9 @@ const FocusTimer = () => {
                                     <input
                                         type="number"
                                         value={pomodoroDuration}
-                                        onChange={(e) => setPomodoroDuration(parseInt(e.target.value) || 1)}
+                                        onChange={(e) => setPomodoroDuration(validateDuration(e.target.value))}
                                         min="1"
+                                        max="999"
                                     />
                                 </div>
                                 <div className="focus-timer-duration-field">
@@ -252,8 +317,9 @@ const FocusTimer = () => {
                                     <input
                                         type="number"
                                         value={shortBreakDuration}
-                                        onChange={(e) => setShortBreakDuration(parseInt(e.target.value) || 1)}
+                                        onChange={(e) => setShortBreakDuration(validateDuration(e.target.value))}
                                         min="1"
+                                        max="999"
                                     />
                                 </div>
                                 <div className="focus-timer-duration-field">
@@ -261,8 +327,9 @@ const FocusTimer = () => {
                                     <input
                                         type="number"
                                         value={longBreakDuration}
-                                        onChange={(e) => setLongBreakDuration(parseInt(e.target.value) || 1)}
+                                        onChange={(e) => setLongBreakDuration(validateDuration(e.target.value))}
                                         min="1"
+                                        max="999"
                                     />
                                 </div>
                             </div>
@@ -285,6 +352,56 @@ const FocusTimer = () => {
                         <div className="focus-timer-modal-footer">
                             <button className="focus-timer-save-btn" onClick={handleSaveSettings}>
                                 Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Sessions Modal */}
+            {showSessions && (
+                <div className="focus-timer-modal" onClick={(e) => {
+                    if (e.target.className === 'focus-timer-modal') setShowSessions(false);
+                }}>
+                    <div className="focus-timer-modal-content focus-timer-sessions-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="focus-timer-sessions-header">
+                            <h3 className="focus-timer-modal-title">Focus Sessions</h3>
+                            <div className="focus-timer-sessions-summary">
+                                <img src={beeImg} alt="Bee" className="focus-timer-bee-icon-large" />
+                                <span className="focus-timer-sessions-count">{totalSessions} sessions completed</span>
+                            </div>
+                        </div>
+
+                        <div className="focus-timer-sessions-list">
+                            {sessions.length === 0 ? (
+                                <div className="focus-timer-no-sessions">
+                                    <p>No sessions completed yet. Start your focus journey!</p>
+                                </div>
+                            ) : (
+                                sessions.map((session) => (
+                                    <div className="focus-timer-session-item" key={session._id}>
+                                        <div className="focus-timer-session-info">
+                                            <div className="focus-timer-session-duration">
+                                                {session.duration} minutes
+                                            </div>
+                                            <div className="focus-timer-session-date">
+                                                {formatDate(session.createdAt)}
+                                            </div>
+                                        </div>
+                                        <button
+                                            className="focus-timer-delete-btn"
+                                            onClick={() => deleteSession(session._id)}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="focus-timer-modal-footer">
+                            <button className="focus-timer-save-btn" onClick={() => setShowSessions(false)}>
+                                Close
                             </button>
                         </div>
                     </div>
