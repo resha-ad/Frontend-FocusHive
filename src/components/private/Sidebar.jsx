@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faBars, faTasks, faProjectDiagram,
-    faClock, faCalendar, faBullseye
+    faClock, faCalendar, faBullseye, faHome
 } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/Sidebar.css'; // Import CSS of the sidebar
 
@@ -36,6 +36,12 @@ const Sidebar = () => {
                 <Link to="/focustimer">
                     <FontAwesomeIcon icon={faBullseye} />
                     <span>Focus</span>
+                </Link>
+            </div>
+            <div className="nav-item">
+                <Link to="/homepage">
+                    <FontAwesomeIcon icon={faHome} />
+                    <span>Home</span>
                 </Link>
             </div>
         </div>

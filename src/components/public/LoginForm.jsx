@@ -49,12 +49,16 @@ const LoginForm = () => {
         try {
             const { token } = await login(email, password);
             saveToken(token);
-            toast.success("Successfully logged in! Redirecting to task page...", {
+            toast.success("Successfully logged in!", {
                 position: "top-center",
                 autoClose: 3000,
             });
             setTimeout(() => {
-                navigate("/task");
+                if (user.isAdmin) {
+                    navigate("/admin-dashboard"); // Redirect to admin dashboard
+                } else {
+                    navigate("/homepage"); // Redirect to task page for regular users
+                }
             }, 3000);
         } catch (error) {
             console.error("Login Error:", error);

@@ -1,18 +1,67 @@
+// Homepage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { submitHelpForm } from '../../services/helpFormService'; // Import the service
 import '../../styles/Homepage.css';
+import { toast } from 'react-toastify';
 
 const Homepage = () => {
     const [activeFaq, setActiveFaq] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+    });
+    const [errors, setErrors] = useState({});
 
     const toggleFaq = (index) => {
         setActiveFaq(activeFaq === index ? null : index);
     };
 
-    const handleFormSubmit = (e) => {
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.name) newErrors.name = "Name is required";
+        if (!formData.email) newErrors.email = "Email is required";
+        else if (!validateEmail(formData.email)) newErrors.email = "Invalid email format";
+        if (!formData.subject) newErrors.subject = "Subject is required";
+        else if (formData.subject.length > 50) newErrors.subject = "Subject must be less than 50 characters";
+        if (!formData.message) newErrors.message = "Message is required";
+        else if (formData.message.length > 500) newErrors.message = "Message must be less than 500 characters";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
-        alert('Thank you for your message! We will get back to you soon.');
-        e.target.reset();
+
+        if (!validateForm()) return;
+
+        try {
+            await submitHelpForm(formData.name, formData.email, formData.subject, formData.message);
+            toast.success("Thank you for your message! We will get back to you soon.", {
+                position: "top-center",
+                autoClose: 3000,
+            });
+            setFormData({ name: '', email: '', subject: '', message: '' }); // Reset form
+        } catch (error) {
+            toast.error(error || "Failed to submit the form. Please try again.", {
+                position: "top-center",
+                autoClose: 3000,
+            });
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
     const faqItems = [
@@ -59,9 +108,9 @@ const Homepage = () => {
                 <div className="homepage-nav-content">
                     <Link to="/" className="homepage-logo">FocusHive</Link>
                     <div className="homepage-nav-links">
-                        <Link to="/tasks">Tasks</Link>
+                        <Link to="/task">Tasks</Link>
                         <Link to="/calendar">Calendar</Link>
-                        <Link to="/timer">Focus Timer</Link>
+                        <Link to="/focustimer">Focus Timer</Link>
                     </div>
                 </div>
             </nav>
@@ -94,19 +143,51 @@ const Homepage = () => {
                     <form id="helpForm" onSubmit={handleFormSubmit}>
                         <div className="homepage-form-group">
                             <label htmlFor="name">Name</label>
-                            <input type="text" id="name" required />
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.name && <span className="error">{errors.name}</span>}
                         </div>
                         <div className="homepage-form-group">
                             <label htmlFor="email">Email</label>
-                            <input type="email" id="email" required />
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.email && <span className="error">{errors.email}</span>}
                         </div>
                         <div className="homepage-form-group">
                             <label htmlFor="subject">Subject</label>
-                            <input type="text" id="subject" required />
+                            <input
+                                type="text"
+                                id="subject"
+                                name="subject"
+                                value={formData.subject}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.subject && <span className="error">{errors.subject}</span>}
                         </div>
                         <div className="homepage-form-group">
                             <label htmlFor="message">Message</label>
-                            <textarea id="message" rows="5" required></textarea>
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows="5"
+                                value={formData.message}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.message && <span className="error">{errors.message}</span>}
                         </div>
                         <button type="submit" className="homepage-submit-btn">Submit</button>
                     </form>
