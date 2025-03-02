@@ -132,11 +132,6 @@ const LoginForm = () => {
                                     required
                                 />
                             </div>
-                            <div className="input-group">
-                                <a href="#" className="toggle-btn">
-                                    Forgot Password?
-                                </a>
-                            </div>
                             <button type="submit" className="btn">
                                 Log In
                             </button>

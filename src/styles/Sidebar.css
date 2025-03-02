@@ -9,7 +9,7 @@
     padding: 40px 0;
     gap: 30px;
     transition: width 0.3s ease;
-    position: fixed;
+    position: relative;
 }
 
 .sidebar.expanded {
@@ -55,4 +55,16 @@
 .nav-item svg {
     width: 20px;
     height: 20px;
+}
+
+.logout-item {
+    margin-top: auto;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+/* Hover effect for the logout button */
+.logout-item:hover {
+    background-color: #c3726c;
+    color: white;
 }

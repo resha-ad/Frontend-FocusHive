@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { removeToken } from '../services/authService';
+import { removeToken } from '../../utils/auth.js';
 
 const LogoutButton = () => {
     const navigate = useNavigate();

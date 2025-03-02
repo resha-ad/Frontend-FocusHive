@@ -1,9 +1,14 @@
-// Homepage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { submitHelpForm } from '../../services/helpFormService'; // Import the service
+import { submitHelpForm } from '../../services/helpFormService';
 import '../../styles/Homepage.css';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Import images
+import calendarImg from '../../assets/calendar.jpg';
+import timerImg from '../../assets/timer.jpg';
+import tasksImg from '../../assets/taskss.jpg';
 
 const Homepage = () => {
     const [activeFaq, setActiveFaq] = useState(null);
@@ -52,7 +57,7 @@ const Homepage = () => {
             });
             setFormData({ name: '', email: '', subject: '', message: '' }); // Reset form
         } catch (error) {
-            toast.error(error || "Failed to submit the form. Please try again.", {
+            toast.error(error.message || "Failed to submit the form. Please try again.", {
                 position: "top-center",
                 autoClose: 3000,
             });
@@ -90,20 +95,24 @@ const Homepage = () => {
     const tools = [
         {
             title: "Task Management",
-            description: "Organize and track your tasks with our intuitive task management system. Set priorities, deadlines, and never miss important work again."
+            description: "Organize and track your tasks with our intuitive task management system. Set priorities, deadlines, and never miss important work again.",
+            image: tasksImg
         },
         {
             title: "Focus Timer",
-            description: "Stay focused and productive with our customizable Pomodoro timer. Track your work sessions and maintain peak productivity."
+            description: "Stay focused and productive with our customizable Pomodoro timer. Track your work sessions and maintain peak productivity.",
+            image: timerImg
         },
         {
             title: "Smart Calendar",
-            description: "Plan your schedule effectively with our intelligent calendar. Sync with your favorite tools and stay on top of your commitments."
+            description: "Plan your schedule effectively with our intelligent calendar. Sync with your favorite tools and stay on top of your commitments.",
+            image: calendarImg
         }
     ];
 
     return (
         <div className="homepage">
+            <ToastContainer />
             <nav className="homepage-navbar">
                 <div className="homepage-nav-content">
                     <Link to="/" className="homepage-logo">FocusHive</Link>
@@ -126,7 +135,7 @@ const Homepage = () => {
                 <div className="homepage-tools-grid">
                     {tools.map((tool, index) => (
                         <div className="homepage-tool-card" key={index}>
-                            <img src={`/api/placeholder/400/320`} alt={tool.title} className="homepage-tool-image" />
+                            <img src={tool.image} alt={tool.title} className="homepage-tool-image" />
                             <div className="homepage-tool-overlay">
                                 <h3>{tool.title}</h3>
                                 <p>{tool.description}</p>

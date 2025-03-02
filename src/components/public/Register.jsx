@@ -18,11 +18,9 @@ const Register = () => {
         email: "",
         password: "",
         confirmPassword: "",
-        agreeToTerms: false,
     });
     const [error, setError] = useState("");
     const [passwordError, setPasswordError] = useState("");
-    const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
     const images = [spreadsheets, desktoppink, desk];
@@ -80,10 +78,6 @@ const Register = () => {
             setError("");
         }
 
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
     };
 
     const handleSubmit = async (e) => {
@@ -123,10 +117,6 @@ const Register = () => {
             validationErrors.push("Passwords do not match");
         }
 
-        if (!formData.agreeToTerms) {
-            validationErrors.push("You must agree to the terms and conditions");
-        }
-
         // If there are validation errors, display them and return
         if (validationErrors.length > 0) {
             setError(validationErrors.join("\n"));
@@ -157,15 +147,6 @@ const Register = () => {
         }
     };
 
-    const handleTermsClick = (e) => {
-        e.preventDefault();
-        e.stopPropagation(); // Add this to prevent event bubbling
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
 
     return (
         <>
@@ -273,27 +254,6 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="terms">
-                                <input
-                                    type="checkbox"
-                                    id="agreeTerms"
-                                    name="agreeToTerms"
-                                    checked={formData.agreeToTerms}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <label htmlFor="agreeTerms">
-                                    I agree to the{" "}
-                                    <span
-                                        onClick={handleTermsClick}
-                                        className="terms-link"
-                                        role="button"
-                                        tabIndex={0}
-                                    >
-                                        terms and conditions
-                                    </span>
-                                </label>
-                            </div>
                             <button type="submit" className="btn">
                                 Sign Up
                             </button>
@@ -307,26 +267,7 @@ const Register = () => {
                 </div>
             </div>
 
-            {/* Modal for Terms and Conditions */}
-            {showModal && (
-                <div className="modal" onClick={(e) => e.target === e.currentTarget && handleCloseModal()}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h2>Terms and Conditions</h2>
-                        <p>
-                            By using Focus Hive, you agree to:
-                            <br /><br />
-                            1. Use the platform responsibly
-                            <br />
-                            2. Respect other users' privacy
-                            <br />
-                            3. Not share your account credentials
-                            <br />
-                            4. Comply with all applicable laws and regulations
-                        </p>
-                        <button onClick={handleCloseModal}>Close</button>
-                    </div>
-                </div>
-            )}
+
         </>
     );
 };

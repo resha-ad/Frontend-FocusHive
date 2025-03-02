@@ -198,7 +198,6 @@ const Task = () => {
                     <h1>Focus Hive</h1>
                     <div className="search-add">
                         <div className="search-box">
-                            <FontAwesomeIcon icon={faSearch} />
                             <input
                                 type="text"
                                 placeholder="Search tasks..."

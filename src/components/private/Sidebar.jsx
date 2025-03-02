@@ -3,15 +3,24 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faBars, faTasks, faProjectDiagram,
-    faClock, faCalendar, faBullseye, faHome
+    faClock, faCalendar, faBullseye, faHome,
+    faSignOutAlt // Added logout icon
 } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/Sidebar.css'; // Import CSS of the sidebar
+import { removeToken } from '../../utils/auth.js'; // Import removeToken function
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Sidebar = () => {
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+    const navigate = useNavigate(); // Initialize navigate
 
     const toggleSidebar = () => {
         setIsSidebarExpanded(!isSidebarExpanded);
+    };
+
+    const handleLogout = () => {
+        removeToken(); // Remove token from localStorage
+        navigate('/login'); // Redirect to login page
     };
 
     return (
@@ -43,6 +52,11 @@ const Sidebar = () => {
                     <FontAwesomeIcon icon={faHome} />
                     <span>Home</span>
                 </Link>
+            </div>
+            {/* Logout button added at the bottom of the sidebar */}
+            <div className="nav-item logout-item" onClick={handleLogout}>
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <span>Logout</span>
             </div>
         </div>
     );
