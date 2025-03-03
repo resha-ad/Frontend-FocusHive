@@ -6,9 +6,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Import images
-import calendarImg from '../../assets/calendar.jpg';
-import timerImg from '../../assets/timer.jpg';
-import tasksImg from '../../assets/taskss.jpg';
+import calendarImg from '../../assets/calendarhome.jpg';
+import timerImg from '../../assets/focushome.jpg';
+import tasksImg from '../../assets/taskhome.jpg';
 
 const Homepage = () => {
     const [activeFaq, setActiveFaq] = useState(null);
